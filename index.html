@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
     <title>Document</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/redux/3.7.2/redux.min.js"></script>
   </head>
   <body>
     <section>
@@ -31,46 +32,6 @@
         );
       }
 
-      // Library code
-      function createStore(reducer) {
-        // The store should have four parts
-        // 1. The state
-        // 2. Get the state
-        // 3. Listen to changes on the state
-        // 4. Update the state
-
-        // Rule 1. "Only an event can change the state of the store."
-        // Rule 2. "The function that returns the new state needs to be a pure function"
-
-        // local priate variable to hold the state (1)
-        let state;
-        // subscriptions - callback functions to be called
-        let listeners = [];
-
-        const getState = () => state;
-
-        const subscribe = listener => {
-          listeners.push(listener);
-          return () => {
-            listeners = listeners.filter(l => l !== listener);
-          };
-        };
-
-        // method to update the state of the store
-        // called
-        const dispatch = action => {
-          state = reducer(state, action);
-          listeners.forEach(listener => listener());
-        };
-
-        // return an object that public exposes the getState() function (2)
-        return {
-          getState,
-          subscribe,
-          dispatch
-        };
-      }
-
       // App code
       const ADD_TODO = "ADD_TODO";
       const REMOVE_TODO = "REMOVE_TODO";
@@ -78,6 +39,7 @@
       const ADD_GOAL = "ADD_GOAL";
       const REMOVE_GOAL = "REMOVE_GOAL";
 
+      // Action creators
       function addTodoAction(todo) {
         return {
           type: ADD_TODO,
@@ -139,14 +101,12 @@
         }
       }
 
-      const app = (state = {}, action) => {
-        return {
-          todos: todos(state.todos, action),
-          goals: goals(state.goals, action)
-        };
-      };
-
-      const store = createStore(app);
+      const store = Redux.createStore(
+        Redux.combineReducers({
+          todos,
+          goals
+        })
+      );
 
       store.subscribe(() => {
         const { todos, goals } = store.getState();
@@ -157,10 +117,6 @@
         todos.forEach(addTodoToDOM);
         goals.forEach(addGoalToDOM);
       });
-
-      // store.subscribe(() => {
-      //   const { todos } = store.getState();
-      // });
 
       // DOM code
       function addTodo() {
