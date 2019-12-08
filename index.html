@@ -128,12 +128,34 @@
         return result;
       };
 
+      const goGetter = store => next => action => {
+        if (action.type === "ADD_TODO" && action.todo.name) {
+          alert("That's a great goal!");
+        }
+
+        return next(action);
+      };
+
+      const dontForget = store => next => action => {
+        if (action.type === "ADD_TODO" && action.todo.name) {
+          return next({
+            ...action,
+            todo: {
+              ...action.todo,
+              name: `Don't forget to ${action.todo.name}!`
+            }
+          });
+        }
+
+        return next(action);
+      };
+
       const store = Redux.createStore(
         Redux.combineReducers({
           todos,
           goals
         }),
-        Redux.applyMiddleware(checker, logger)
+        Redux.applyMiddleware(checker, logger, dontForget, goGetter)
       );
 
       store.subscribe(() => {
