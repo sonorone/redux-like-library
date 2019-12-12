@@ -287,7 +287,7 @@
                   this.input = input;
                 }}
               />
-              <button onClick={this.addItem}>Add</button>
+              <button onClick={this.addItem}>+</button>
               <List />
             </div>
           );
@@ -295,10 +295,28 @@
       }
 
       class Goals extends React.Component {
+        addItem = e => {
+          e.preventDefault();
+          const name = this.input.value;
+          this.input.value = "";
+
+          this.props.store.dispatch(
+            addGoalAction({
+              id: generateId(),
+              name
+            })
+          );
+        };
         render() {
           return (
             <div>
-              GOALS
+              <h1>GOALS</h1>
+              <input
+                placeholder="Add Goal"
+                type="text"
+                ref={inputElement => (this.input = inputElement)}
+              />
+              <button onClick={this.addItem}>+</button>
               <List />
             </div>
           );
@@ -310,7 +328,7 @@
           return (
             <div>
               <Todos store={this.props.store} />
-              <Goals />
+              <Goals store={this.props.store} />
             </div>
           );
         }
