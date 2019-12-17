@@ -164,7 +164,7 @@
           todos,
           goals
         }),
-        Redux.applyMiddleware(checker, logger, dontForget, goGetter)
+        Redux.applyMiddleware(checker, logger, dontForget /* goGetter */)
       );
 
       store.subscribe(() => {
@@ -255,9 +255,16 @@
     <script type="text/babel">
       function List(props) {
         return (
-          <ul>
-            <li>LIST</li>
-          </ul>
+          <div>
+            <ul>
+              {props.items.map(item => (
+                <li key={item.id}>
+                  <span>{item.name}</span>
+                  <button onClick={() => props.handleRemove(item.id)}>X</button>
+                </li>
+              ))}
+            </ul>
+          </div>
         );
       }
 
@@ -275,11 +282,13 @@
             })
           );
         };
+
+        removeItem = id => store.dispatch(removeTodoAction(id));
+
         render() {
           return (
             <div>
               <h1>TODOS</h1>
-
               <input
                 type="text"
                 placeholder="Add todo"
@@ -288,7 +297,7 @@
                 }}
               />
               <button onClick={this.addItem}>+</button>
-              <List />
+              <List items={this.props.todos} handleRemove={this.removeItem} />
             </div>
           );
         }
@@ -307,6 +316,9 @@
             })
           );
         };
+
+        removeItem = id => store.dispatch(removeGoalAction(id));
+
         render() {
           return (
             <div>
@@ -317,18 +329,27 @@
                 ref={inputElement => (this.input = inputElement)}
               />
               <button onClick={this.addItem}>+</button>
-              <List />
+              <List items={this.props.goals} handleRemove={this.removeItem} />
             </div>
           );
         }
       }
 
       class App extends React.Component {
+        componentDidMount() {
+          const { store } = this.props;
+
+          store.subscribe(() => this.forceUpdate());
+        }
+
         render() {
+          const { store } = this.props;
+          const { todos, goals } = store.getState();
+
           return (
             <div>
-              <Todos store={this.props.store} />
-              <Goals store={this.props.store} />
+              <Todos todos={todos} store={this.props.store} />
+              <Goals goals={goals} store={this.props.store} />
             </div>
           );
         }
