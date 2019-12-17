@@ -259,7 +259,16 @@
             <ul>
               {props.items.map(item => (
                 <li key={item.id}>
-                  <span>{item.name}</span>
+                  <span
+                    onClick={() =>
+                      props.handleToggle && props.handleToggle(item.id)
+                    }
+                    style={{
+                      textDecoration: item.complete ? "line-through" : "none"
+                    }}
+                  >
+                    {item.name}
+                  </span>
                   <button onClick={() => props.handleRemove(item.id)}>X</button>
                 </li>
               ))}
@@ -283,7 +292,9 @@
           );
         };
 
-        removeItem = id => store.dispatch(removeTodoAction(id));
+        removeItem = id => this.props.store.dispatch(removeTodoAction(id));
+
+        toggleTodo = id => this.props.store.dispatch(toggleTodoAction(id));
 
         render() {
           return (
@@ -297,7 +308,11 @@
                 }}
               />
               <button onClick={this.addItem}>+</button>
-              <List items={this.props.todos} handleRemove={this.removeItem} />
+              <List
+                items={this.props.todos}
+                handleToggle={this.toggleTodo}
+                handleRemove={this.removeItem}
+              />
             </div>
           );
         }
@@ -317,7 +332,7 @@
           );
         };
 
-        removeItem = id => store.dispatch(removeGoalAction(id));
+        removeItem = id => this.props.store.dispatch(removeGoalAction(id));
 
         render() {
           return (
