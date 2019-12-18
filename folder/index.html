@@ -177,7 +177,7 @@
           goals,
           loading
         }),
-        Redux.applyMiddleware(checker, logger, dontForget, goGetter)
+        Redux.applyMiddleware(checker, logger)
       );
     </script>
 
@@ -223,9 +223,21 @@
 
         removeItem = todo => {
           this.props.store.dispatch(removeTodoAction(todo.id));
+
+          API.deleteTodo(todo.id).catch(() => {
+            this.props.store.dispatch(addTodoAction(todo));
+            alert("Error occured while deleting. Try again.");
+          });
         };
 
-        toggleTodo = id => this.props.store.dispatch(toggleTodoAction(id));
+        toggleTodo = id => {
+          this.props.store.dispatch(toggleTodoAction(id));
+
+          API.saveTodoToggle(id).catch(() => {
+            this.props.store.dispatch(toggleTodoAction(id));
+            alert("Error occured while deleting. Try again.");
+          });
+        };
 
         render() {
           return (
@@ -263,8 +275,14 @@
           );
         };
 
-        removeItem = goal =>
+        removeItem = goal => {
           this.props.store.dispatch(removeGoalAction(goal.id));
+
+          API.deleteGoal(goal.id).catch(() => {
+            this.props.store.dispatch(addGoalAction(goal));
+            alert("Error occured while deleting. Try again.");
+          });
+        };
 
         render() {
           return (
