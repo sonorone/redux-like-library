@@ -210,15 +210,11 @@
         addItem = e => {
           e.preventDefault();
           const name = this.input.value;
-          this.input.value = "";
 
-          this.props.store.dispatch(
-            addTodoAction({
-              id: generateId(),
-              name,
-              complete: false
-            })
-          );
+          API.saveTodo(name).then(todo => {
+            this.props.store.dispatch(addTodoAction(todo));
+            this.input.value = "";
+          });
         };
 
         removeItem = todo => {
@@ -265,14 +261,11 @@
         addItem = e => {
           e.preventDefault();
           const name = this.input.value;
-          this.input.value = "";
 
-          this.props.store.dispatch(
-            addGoalAction({
-              id: generateId(),
-              name
-            })
-          );
+          API.saveGoal(name).then(goal => {
+            this.props.store.dispatch(addGoalAction(goal));
+            this.input.value = "";
+          });
         };
 
         removeItem = goal => {
