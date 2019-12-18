@@ -29,6 +29,7 @@
       const TOGGLE_TODO = "TOGGLE_TODO";
       const ADD_GOAL = "ADD_GOAL";
       const REMOVE_GOAL = "REMOVE_GOAL";
+      const RECEIVE_DATA = "RECEIVE_DATA";
 
       // Action creators
       function addTodoAction(todo) {
@@ -61,6 +62,19 @@
           id
         };
       }
+      function receiveDataAction(todos, goals) {
+        return {
+          type: RECEIVE_DATA,
+          todos,
+          goals
+        };
+      }
+      function loadingAction(loading) {
+        return {
+          type: RECEIVE_DATA,
+          loading
+        };
+      }
 
       // 1 - reducer
       function todos(state = [], action) {
@@ -75,6 +89,8 @@
                 ? todo
                 : Object.assign({}, todo, { complete: !todo.complete })
             );
+          case RECEIVE_DATA:
+            return action.todos;
           default:
             return state;
         }
@@ -87,6 +103,18 @@
             return state.concat([action.goal]);
           case REMOVE_GOAL:
             return state.filter(goal => goal.id !== action.id);
+          case RECEIVE_DATA:
+            return action.goals;
+          default:
+            return state;
+        }
+      }
+
+      // 3 - reducer
+      function loading(state = true, action) {
+        switch (action.type) {
+          case RECEIVE_DATA:
+            return false;
           default:
             return state;
         }
@@ -146,7 +174,8 @@
       const store = Redux.createStore(
         Redux.combineReducers({
           todos,
-          goals
+          goals,
+          loading
         }),
         Redux.applyMiddleware(checker, logger, dontForget, goGetter)
       );
@@ -169,7 +198,7 @@
                   >
                     {item.name}
                   </span>
-                  <button onClick={() => props.handleRemove(item.id)}>X</button>
+                  <button onClick={() => props.handleRemove(item)}>X</button>
                 </li>
               ))}
             </ul>
@@ -192,7 +221,9 @@
           );
         };
 
-        removeItem = id => this.props.store.dispatch(removeTodoAction(id));
+        removeItem = todo => {
+          this.props.store.dispatch(removeTodoAction(todo.id));
+        };
 
         toggleTodo = id => this.props.store.dispatch(toggleTodoAction(id));
 
@@ -232,7 +263,8 @@
           );
         };
 
-        removeItem = id => this.props.store.dispatch(removeGoalAction(id));
+        removeItem = goal =>
+          this.props.store.dispatch(removeGoalAction(goal.id));
 
         render() {
           return (
@@ -255,11 +287,19 @@
           const { store } = this.props;
 
           store.subscribe(() => this.forceUpdate());
+
+          Promise.all([API.fetchTodos(), API.fetchGoals()]).then(
+            ([todos, goals]) => {
+              store.dispatch(receiveDataAction(todos, goals));
+            }
+          );
         }
 
         render() {
           const { store } = this.props;
-          const { todos, goals } = store.getState();
+          const { todos, goals, loading } = store.getState();
+
+          if (loading === true) return <h3>Loading...</h3>;
 
           return (
             <div>
