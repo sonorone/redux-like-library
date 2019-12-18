@@ -75,6 +75,16 @@
           loading
         };
       }
+      function handleDeleteTodo(item) {
+        return dispatch => {
+          dispatch(removeTodoAction(item.id));
+
+          API.deleteTodo(item.id).catch(() => {
+            dispatch(addTodoAction(item));
+            alert("An error occured. Try again.");
+          });
+        };
+      }
 
       // 1 - reducer
       function todos(state = [], action) {
@@ -95,7 +105,6 @@
             return state;
         }
       }
-
       // 2 - reducer
       function goals(state = [], action) {
         switch (action.type) {
@@ -109,7 +118,6 @@
             return state;
         }
       }
-
       // 3 - reducer
       function loading(state = true, action) {
         switch (action.type) {
@@ -138,7 +146,6 @@
 
         return next(action);
       };
-
       const logger = store => next => action => {
         console.group(action.type);
         console.log("The action: ", action);
@@ -147,24 +154,9 @@
         console.groupEnd();
         return result;
       };
-
-      const goGetter = store => next => action => {
-        if (action.type === "ADD_TODO" && action.todo.name) {
-          alert("That's a great goal!");
-        }
-
-        return next(action);
-      };
-
-      const dontForget = store => next => action => {
-        if (action.type === "ADD_TODO" && action.todo.name) {
-          return next({
-            ...action,
-            todo: {
-              ...action.todo,
-              name: `Don't forget to ${action.todo.name}!`
-            }
-          });
+      const thunk = store => next => action => {
+        if (typeof action === "function") {
+          return action(store.dispatch);
         }
 
         return next(action);
@@ -177,7 +169,7 @@
           goals,
           loading
         }),
-        Redux.applyMiddleware(checker, logger)
+        Redux.applyMiddleware(thunk, checker, logger)
       );
     </script>
 
@@ -218,12 +210,7 @@
         };
 
         removeItem = todo => {
-          this.props.store.dispatch(removeTodoAction(todo.id));
-
-          API.deleteTodo(todo.id).catch(() => {
-            this.props.store.dispatch(addTodoAction(todo));
-            alert("Error occured while deleting. Try again.");
-          });
+          this.props.store.dispatch(handleDeleteTodo(todo));
         };
 
         toggleTodo = id => {
