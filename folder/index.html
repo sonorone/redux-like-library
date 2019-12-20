@@ -31,6 +31,7 @@
       const ADD_GOAL = "ADD_GOAL";
       const REMOVE_GOAL = "REMOVE_GOAL";
       const RECEIVE_DATA = "RECEIVE_DATA";
+      // end
 
       // Action creators
       function addTodoAction(todo) {
@@ -76,7 +77,9 @@
           loading
         };
       }
+      // end of Action creators
 
+      // redux-thunk async action creators
       function handleSaveTodo(name, cb) {
         return dispatch => {
           return API.saveTodo(name)
@@ -97,7 +100,16 @@
           });
         };
       }
-      function handleSaveToggle(item) {}
+      function handleToggle(id) {
+        return dispatch => {
+          dispatch(toggleTodoAction(id));
+
+          API.saveTodoToggle(id).catch(() => {
+            dispatch(toggleTodoAction(id));
+            alert("An error occured. Try again.");
+          });
+        };
+      }
       function handleSaveGoal(name, cb) {
         return dispatch => {
           return API.saveGoal(name)
@@ -118,6 +130,7 @@
           });
         };
       }
+      // end of redux-thunk async action creators
 
       // 1 - reducer
       function todos(state = [], action) {
@@ -237,12 +250,7 @@
         };
 
         toggleTodo = id => {
-          this.props.store.dispatch(toggleTodoAction(id));
-
-          API.saveTodoToggle(id).catch(() => {
-            this.props.store.dispatch(toggleTodoAction(id));
-            alert("Error occured while deleting. Try again.");
-          });
+          this.props.store.dispatch(handleToggle(id));
         };
 
         render() {
