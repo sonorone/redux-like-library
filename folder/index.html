@@ -248,17 +248,17 @@
       class Todos extends React.Component {
         addItem = e => {
           e.preventDefault();
-          this.props.store.dispatch(
+          this.props.dispatch(
             handleSaveTodo(this.input.value, () => (this.input.value = ""))
           );
         };
 
         removeItem = todo => {
-          this.props.store.dispatch(handleDeleteTodo(todo));
+          this.props.dispatch(handleDeleteTodo(todo));
         };
 
         toggleTodo = id => {
-          this.props.store.dispatch(handleToggle(id));
+          this.props.dispatch(handleToggle(id));
         };
 
         render() {
@@ -285,13 +285,13 @@
       class Goals extends React.Component {
         addItem = e => {
           e.preventDefault();
-          this.props.store.dispatch(
+          this.props.dispatch(
             handleSaveGoal(this.input.value, () => (this.input.value = ""))
           );
         };
 
         removeItem = goal => {
-          this.props.store.dispatch(handleDeleteGoal(goal));
+          this.props.dispatch(handleDeleteGoal(goal));
         };
 
         render() {
@@ -336,9 +336,9 @@
           return (
             <Context.Consumer>
               {store => {
-                const { todos, goals } = store.getState();
+                const { todos } = store.getState();
 
-                return <Todos store={store} todos={todos} />;
+                return <Todos store={store.dispatch} todos={todos} />;
               }}
             </Context.Consumer>
           );
@@ -349,9 +349,9 @@
           return (
             <Context.Consumer>
               {store => {
-                const { todos, goals } = store.getState();
+                const { goals } = store.getState();
 
-                return <Goals store={store} goals={goals} />;
+                return <Goals store={store.dispatch} goals={goals} />;
               }}
             </Context.Consumer>
           );
