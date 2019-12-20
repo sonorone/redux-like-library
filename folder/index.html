@@ -338,7 +338,7 @@
               {store => {
                 const { todos } = store.getState();
 
-                return <Todos store={store.dispatch} todos={todos} />;
+                return <Todos dispatch={store.dispatch} todos={todos} />;
               }}
             </Context.Consumer>
           );
@@ -351,7 +351,7 @@
               {store => {
                 const { goals } = store.getState();
 
-                return <Goals store={store.dispatch} goals={goals} />;
+                return <Goals dispatch={store.dispatch} goals={goals} />;
               }}
             </Context.Consumer>
           );
