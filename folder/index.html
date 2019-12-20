@@ -245,7 +245,6 @@
           </div>
         );
       }
-
       class Todos extends React.Component {
         addItem = e => {
           e.preventDefault();
@@ -283,7 +282,6 @@
           );
         }
       }
-
       class Goals extends React.Component {
         addItem = e => {
           e.preventDefault();
@@ -311,7 +309,6 @@
           );
         }
       }
-
       class App extends React.Component {
         componentDidMount() {
           const { store } = this.props;
@@ -321,19 +318,45 @@
 
         render() {
           const { store } = this.props;
-          const { todos, goals, loading } = store.getState();
+          const { loading } = store.getState();
 
           if (loading === true) return <h3>Loading...</h3>;
 
           return (
             <div>
-              <Todos todos={todos} store={this.props.store} />
-              <Goals goals={goals} store={this.props.store} />
+              <ConnectedTodos />
+              <ConnectedGoals />
             </div>
           );
         }
       }
 
+      class ConnectedTodos extends React.Component {
+        render() {
+          return (
+            <Context.Consumer>
+              {store => {
+                const { todos, goals } = store.getState();
+
+                return <Todos store={store} todos={todos} />;
+              }}
+            </Context.Consumer>
+          );
+        }
+      }
+      class ConnectedGoals extends React.Component {
+        render() {
+          return (
+            <Context.Consumer>
+              {store => {
+                const { todos, goals } = store.getState();
+
+                return <Goals store={store} goals={goals} />;
+              }}
+            </Context.Consumer>
+          );
+        }
+      }
       class ConnectedApp extends React.Component {
         render() {
           return (
@@ -343,7 +366,6 @@
           );
         }
       }
-
       class Provider extends React.Component {
         render() {
           return (
