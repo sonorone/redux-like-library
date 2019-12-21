@@ -245,7 +245,6 @@
           </div>
         );
       }
-
       class Todos extends React.Component {
         addItem = e => {
           e.preventDefault();
@@ -312,11 +311,18 @@
       }
       class App extends React.Component {
         componentDidMount() {
+          // const { store } = this.props;
+          // store.subscribe(() => this.forceUpdate());
+          // store.dispatch(handleInitialData());
           this.props.dispatch(handleInitialData());
         }
 
         render() {
-          if (this.props.loading) return <h3>Loading...</h3>;
+          // const { store } = this.props;
+          // const { loading } = store.getState();
+          const { loading } = this.props;
+
+          if (loading === true) return <h3>Loading...</h3>;
 
           return (
             <div>
@@ -327,13 +333,42 @@
         }
       }
 
-      const ConnectedTodos = connect(state => {
-        todos: state.todos;
-      })(Todos);
+      class ConnectedTodos extends React.Component {
+        render() {
+          return (
+            <Context.Consumer>
+              {store => {
+                const { todos } = store.getState();
 
-      const ConnectedGoals = connect(state => {
-        goals: state.goals;
-      })(Goals);
+                return <Todos dispatch={store.dispatch} todos={todos} />;
+              }}
+            </Context.Consumer>
+          );
+        }
+      }
+      class ConnectedGoals extends React.Component {
+        render() {
+          return (
+            <Context.Consumer>
+              {store => {
+                const { goals } = store.getState();
+
+                return <Goals dispatch={store.dispatch} goals={goals} />;
+              }}
+            </Context.Consumer>
+          );
+        }
+      }
+
+      // class ConnectedApp extends React.Component {
+      //   render() {
+      //     return (
+      //       <Context.Consumer>
+      //         {store => <App store={store} />}
+      //       </Context.Consumer>
+      //     );
+      //   }
+      // }
 
       const ConnectedApp = connect(state => {
         loading: state.loading;
